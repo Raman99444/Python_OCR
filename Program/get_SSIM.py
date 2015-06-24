@@ -97,4 +97,10 @@ def compute_ssim(im1, im2, gaussian_kernel_1d = None):
     return "%.4f"%index
 
 
+if __name__=="__main__":
+    img1 = cv2.imread(r'C:\3.bmp')
+    img2 = cv2.imread(r'C:\4.bmp')
+
+    print(compute_ssim(img1, img2))	
+	
 	
