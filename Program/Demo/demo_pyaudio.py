@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 
+
 '''
 This file us demo the pyaudio package. 
 Can reference the file "PyAudio.py" at the same folder.
 '''
 
-
 import numpy as np
 from pyaudio import PyAudio, paInt16
 from datetime import datetime
 import wave
+from Tkinter import *
 
 #define of params
 NUM_SAMPLES = 2000
@@ -28,6 +29,17 @@ def save_wave_file(filename, data):
     wf.writeframes("".join(data))
     wf.close()
 
+def my_button(root,label_text,button_text,button_func):  
+    '''''function of creat label and button'''  
+    #label details  
+    label = Label(root)  
+    label['text'] = label_text  
+    label.pack()  
+    #label details  
+    button = Button(root)  
+    button['text'] = button_text  
+    button['command'] = button_func  
+    button.pack()	
   
 def record_wave():
     #open the input of wave
@@ -49,6 +61,10 @@ def record_wave():
     save_buffer = []
     print filename, "saved"
 
+def main():
+    root = Tk()
+    my_button(root,"Record a wave","clik to record",record_wave)
+    root.mainloop()
   
 if __name__ == "__main__":
-    record_wave()
+    main()
