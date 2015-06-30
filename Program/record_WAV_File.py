@@ -36,7 +36,30 @@ def record_wave(filename):
         count += 1
         print ('recoding......')
 	
-	
+    save_wave_file(filename, save_buffer)
+    save_buffer = []
+    print (filename + " saved")
 
-record_wave(r'c:\cap.wav')
+	
+'''
+save the date to the wav file
+'''
+def save_wave_file(filename, data):
+    #define of params
+	#The setting need same with the 'record_wave' function define.
+    framerate = 44100 
+    channels = 2
+    width = 2
+    
+    #save the date to the wav file
+    wf = wave.open(filename, 'wb')
+    wf.setnchannels(channels)
+    wf.setsampwidth(width)
+    wf.setframerate(framerate)
+    wf.writeframes("".join(data))
+    wf.close()
+
+if __name__ == "__main__":
+    filename = SCRIPT_PATH + "\cap.wav"
+    record_wave(filename)
 
