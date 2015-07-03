@@ -24,10 +24,7 @@ SOCKET_RECV_DATA = ""
 SOCKET_SEND_DATA = ""
 
 
-#-------------------------------------------------------------------------------
-'''
-Picture operature
-'''             
+#-------------------------------------------------------------------------------            
 class HDMI_OCR_VIDEO:
     def __init__(self):
         pass
@@ -48,7 +45,6 @@ class HDMI_OCR_VIDEO:
         # Start a thread with the server -- that thread will then start one
         # more thread for each request
         server_thread = threading.Thread(target=server.serve_forever)
-		
         # Exit the server thread when the main thread terminates
         server_thread.daemon = True
         server_thread.start()
@@ -60,6 +56,7 @@ class HDMI_OCR_VIDEO:
             #resize the image
             d = capture.get(cv.CV_CAP_PROP_FRAME_WIDTH)
             h = capture.get(cv.CV_CAP_PROP_FRAME_HEIGHT)
+
             #cv.SetCaptureProperty(capture, cv.CV_CAP_PROP_FRAME_WIDTH, 640)
             #cv.SetCaptureProperty(capture, cv.CV_CAP_PROP_FRAME_HEIGH, 480)
             
@@ -95,6 +92,7 @@ class HDMI_OCR_VIDEO:
             global SOCKET_SEND_DATA
             if len(SOCKET_RECV_DATA) > 1:
                 print(SOCKET_RECV_DATA)
+			#capture a image
             if "cap" in SOCKET_RECV_DATA.lower():
                 SOCKET_RECV_DATA = ""
                 try:
@@ -102,7 +100,36 @@ class HDMI_OCR_VIDEO:
                 except:
                     print("capture_Image error")
                 finally:
-                    pass              
+                    pass
+			
+			#compare the image, need a sample image
+            elif "testimage:" in SOCKET_RECV_DATA.lower():
+                #the input command format is : testimage:4
+                #the input SPEC image file name format is : "Model_4.bmp"                
+                filename = "Model_" + SOCKET_RECV_DATA.split(':')[-1].strip() + '.bmp'
+                
+                SOCKET_RECV_DATA = ""
+                sir = "-999"
+                try:
+                    #use SSIM way get two image's rate
+                    sir = self.compare_Image(filename)                
+                finally:
+                    SOCKET_SEND_DATA = sir
+            
+			#capture the single and analysis the frequence.        
+            elif "audiotest" in  SOCKET_RECV_DATA.lower():
+                SOCKET_RECV_DATA = ""
+                avg_L = "-999"
+                avg_R = "-999"
+                try:
+                    filename = SCRIPT_PATH + "\cap.wav"
+                    record_WAV_File.record_wave(filename)
+                    avg_L, avg_R = get_WAV_Freq.get_WAV_Freq(filename)
+                except:
+                    print("audioTest error")                    
+                finally:
+                    SOCKET_SEND_DATA = avg_L + " : " + avg_R
+                
             else:
                 #print('please check the command \'%s\' is right' % SOCKET_RECV_DATA)
                 SOCKET_RECV_DATA = ""
@@ -160,4 +187,7 @@ class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
 class ThreadedTCPServer(SocketServer.ThreadingMixIn, SocketServer.TCPServer):
     pass
 
-	
+#-------------------------------------------------------------------------------
+if __name__=="__main__":
+    ocr = HDMI_OCR_VIDEO()
+    ocr.run()
